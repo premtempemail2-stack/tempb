@@ -381,7 +381,7 @@ exports.updateCustomDomain = async (req, res, next) => {
 exports.getPublished = async (req, res, next) => {
   try {
     const site = await UserSite.findOne({
-      siteId: req.params.siteId,
+      _id: req.params.siteId,
       deploymentStatus: "published",
     }).select(
       "siteId name publishedContent publishedDynamicContent metadata customDomain"
