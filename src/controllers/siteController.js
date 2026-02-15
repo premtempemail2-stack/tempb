@@ -1,5 +1,6 @@
 const UserSite = require("../models/UserSite");
 const Template = require("../models/Template");
+const Domain = require("../models/Domain");
 const generateSiteId = require("../utils/generateSiteId");
 const {
   compareTemplateVersions,
@@ -183,6 +184,8 @@ exports.getPreview = async (req, res, next) => {
 // @access  Private
 exports.publishSite = async (req, res, next) => {
   try {
+    const { customDomain } = req.body || {};
+
     const site = await UserSite.findOne({
       siteId: req.params.siteId,
       userId: req.user._id,
@@ -195,6 +198,34 @@ exports.publishSite = async (req, res, next) => {
       });
     }
 
+    const isFirstPublish = site.deploymentStatus === "draft";
+    let domainRecord = null;
+
+    // On first publish, allow setting a custom domain
+    if (isFirstPublish && customDomain) {
+      const normalizedDomain = customDomain.toLowerCase().trim();
+
+      // Check if domain is already taken
+      const existingDomain = await Domain.findOne({ domain: normalizedDomain });
+      if (existingDomain) {
+        return res.status(400).json({
+          success: false,
+          message: "Domain is already registered to another site",
+        });
+      }
+
+      // Create domain record
+      domainRecord = await Domain.create({
+        domain: normalizedDomain,
+        siteId: site._id,
+        userId: req.user._id,
+      });
+
+      // Set custom domain on site (not verified yet)
+      site.customDomain = normalizedDomain;
+      site.domainVerified = false;
+    }
+
     // Copy draft to published
     site.publishedContent = site.draftContent;
     site.publishedDynamicContent = site.draftDynamicContent;
@@ -203,21 +234,140 @@ exports.publishSite = async (req, res, next) => {
 
     await site.save();
 
-    // TODO: Trigger revalidation webhook for Next.js rendering engine
-    // TODO: Move assets from temp to permanent storage
+    // Build response
+    const responseData = {
+      siteId: site.siteId,
+      publishedAt: site.publishedAt,
+      publishedUrl:
+        site.customDomain && site.domainVerified
+          ? `https://${site.customDomain}`
+          : `https://${site.siteId}.${
+              process.env.BUILDER_DOMAIN || "builder.com"
+            }`,
+      customDomain: site.customDomain || null,
+      domainVerified: site.domainVerified,
+      isFirstPublish,
+    };
+
+    // Include DNS instructions if a new domain was just added
+    if (domainRecord) {
+      responseData.domainSetup = {
+        domainId: domainRecord._id,
+        verificationToken: domainRecord.verificationToken,
+        instructions: {
+          step1: "Add a TXT record to your DNS settings",
+          step2: "Host: @ or _webbuilder-verify",
+          step3: `Value: ${domainRecord.verificationToken}`,
+          step4: "Add a CNAME record pointing to your builder subdomain",
+          step5: `CNAME: ${site.siteId}.${
+            process.env.BUILDER_DOMAIN || "builder.com"
+          }`,
+          step6: "Wait for DNS propagation (may take up to 48 hours)",
+          step7: "Click verify once the records are added",
+        },
+      };
+    }
 
     res.json({
       success: true,
       message: "Site published successfully",
-      data: {
-        siteId: site.siteId,
-        publishedAt: site.publishedAt,
-        publishedUrl:
-          site.customDomain && site.domainVerified
-            ? `https://${site.customDomain}`
-            : `https://${site.siteId}.${
+      data: responseData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update custom domain for a site
+// @route   PUT /api/sites/:siteId/domain
+// @access  Private
+exports.updateCustomDomain = async (req, res, next) => {
+  try {
+    const { customDomain } = req.body;
+
+    const site = await UserSite.findOne({
+      siteId: req.params.siteId,
+      userId: req.user._id,
+    });
+
+    if (!site) {
+      return res.status(404).json({
+        success: false,
+        message: "Site not found",
+      });
+    }
+
+    // Remove existing domain if any
+    if (site.customDomain) {
+      await Domain.findOneAndDelete({
+        domain: site.customDomain,
+        userId: req.user._id,
+      });
+      site.customDomain = null;
+      site.domainVerified = false;
+    }
+
+    // If a new domain is provided, set it
+    if (customDomain) {
+      const normalizedDomain = customDomain.toLowerCase().trim();
+
+      // Check if domain is already taken
+      const existingDomain = await Domain.findOne({ domain: normalizedDomain });
+      if (existingDomain) {
+        return res.status(400).json({
+          success: false,
+          message: "Domain is already registered to another site",
+        });
+      }
+
+      // Create domain record
+      const domainRecord = await Domain.create({
+        domain: normalizedDomain,
+        siteId: site._id,
+        userId: req.user._id,
+      });
+
+      site.customDomain = normalizedDomain;
+      site.domainVerified = false;
+      await site.save();
+
+      return res.json({
+        success: true,
+        message: customDomain
+          ? "Custom domain updated successfully"
+          : "Custom domain removed",
+        data: {
+          siteId: site.siteId,
+          customDomain: site.customDomain,
+          domainVerified: site.domainVerified,
+          domainSetup: {
+            domainId: domainRecord._id,
+            verificationToken: domainRecord.verificationToken,
+            instructions: {
+              step1: "Add a TXT record to your DNS settings",
+              step2: "Host: @ or _webbuilder-verify",
+              step3: `Value: ${domainRecord.verificationToken}`,
+              step4: "Add a CNAME record pointing to your builder subdomain",
+              step5: `CNAME: ${site.siteId}.${
                 process.env.BUILDER_DOMAIN || "builder.com"
               }`,
+              step6: "Wait for DNS propagation (may take up to 48 hours)",
+              step7: "Click verify once the records are added",
+            },
+          },
+        },
+      });
+    }
+
+    await site.save();
+
+    res.json({
+      success: true,
+      message: "Custom domain removed",
+      data: {
+        siteId: site.siteId,
+        customDomain: null,
+        domainVerified: false,
       },
     });
   } catch (error) {

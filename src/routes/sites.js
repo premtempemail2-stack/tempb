@@ -50,6 +50,9 @@ router.get("/:siteId/preview", siteController.getPreview);
 // Publish
 router.post("/:siteId/publish", siteController.publishSite);
 
+// Custom domain management
+router.put("/:siteId/domain", siteController.updateCustomDomain);
+
 // Template updates
 router.get("/:siteId/check-updates", siteController.checkUpdates);
 router.post("/:siteId/apply-update", siteController.applyUpdate);

@@ -249,3 +249,50 @@ exports.deleteDomain = async (req, res, next) => {
     next(error);
   }
 };
+// @desc    Lookup siteId by domain
+// @route   GET /public/domains/lookup/:domain
+// @access  Public
+exports.lookupDomain = async (req, res, next) => {
+  try {
+    const { domain } = req.params;
+
+    if (!domain) {
+      return res.status(400).json({
+        success: false,
+        message: "Domain is required",
+      });
+    }
+
+    const host = domain.toLowerCase().trim();
+    // Normalize: strip 'www.' for lookup if the secondary version is not registered
+    const normalizedHost = host.startsWith("www.") ? host.slice(4) : host;
+
+    // Check exactly as requested first
+    let domainRecord = await Domain.findOne({ domain: host, verified: true });
+
+    // If not found and it was a www version, try the non-www version
+    if (!domainRecord && host.startsWith("www.")) {
+      domainRecord = await Domain.findOne({
+        domain: normalizedHost,
+        verified: true,
+      });
+    }
+
+    if (!domainRecord) {
+      return res.status(404).json({
+        success: false,
+        message: "Domain not found or not verified",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        siteId: domainRecord.siteId,
+        domain: domainRecord.domain,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
