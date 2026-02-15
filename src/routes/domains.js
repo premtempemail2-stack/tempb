@@ -11,7 +11,7 @@ const addDomainValidation = [
     .trim()
     .notEmpty()
     .withMessage("Domain is required")
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/)
+    .matches(/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i)
     .withMessage("Please provide a valid domain"),
   body("siteId")
     .notEmpty()

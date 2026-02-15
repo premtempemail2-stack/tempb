@@ -42,11 +42,24 @@ exports.addDomain = async (req, res, next) => {
     }
 
     // Check if domain already exists
-    const existingDomain = await Domain.findOne({ domain });
+    const existingDomain = await Domain.findOne({ domain }).populate(
+      "siteId",
+      "name"
+    );
     if (existingDomain) {
       return res.status(400).json({
         success: false,
         message: "Domain already registered",
+        data: {
+          isOwner: existingDomain.userId.toString() === req.user._id.toString(),
+          linkedSiteName: existingDomain.siteId
+            ? existingDomain.siteId.name
+            : "another site",
+          linkedSiteId: existingDomain.siteId
+            ? existingDomain.siteId._id
+            : null,
+          domainId: existingDomain._id,
+        },
       });
     }
 
