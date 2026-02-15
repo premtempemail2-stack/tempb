@@ -281,14 +281,17 @@ exports.lookupDomain = async (req, res, next) => {
     const normalizedHost = host.startsWith("www.") ? host.slice(4) : host;
 
     // Check exactly as requested first
-    let domainRecord = await Domain.findOne({ domain: host, verified: true });
+    let domainRecord = await Domain.findOne({
+      domain: host,
+      verified: true,
+    }).populate("siteId", "siteId");
 
     // If not found and it was a www version, try the non-www version
     if (!domainRecord && host.startsWith("www.")) {
       domainRecord = await Domain.findOne({
         domain: normalizedHost,
         verified: true,
-      });
+      }).populate("siteId", "siteId");
     }
 
     if (!domainRecord) {
@@ -301,7 +304,7 @@ exports.lookupDomain = async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        siteId: domainRecord.siteId,
+        siteId: domainRecord.siteId ? domainRecord.siteId.siteId : null,
         domain: domainRecord.domain,
       },
     });
