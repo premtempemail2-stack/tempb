@@ -1,379 +1,549 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const Template = require("../models/Template");
-
-const templates = [
-  {
-    name: "Daycare Center",
-    version: "1.0.0",
-    description:
-      "A beautiful template for daycare centers and childcare facilities",
-    thumbnail: "https://example.com/thumbnails/daycare.jpg",
-    category: "education",
-    config: {
-      pages: [
-        {
-          id: "p1",
-          slug: "index",
-          title: "Daycare | Homepage",
-          seo: {
-            description: "This is the daycare page",
-            ogImage: "https://example.com/ogimage.jpg",
-          },
-          sections: [
-            {
-              id: "s1",
-              type: "Navbar",
-              props: {
-                logoUrl: "https://example.com/logo.jpg",
-                tabs: [
-                  { id: "tab1", label: "About US", action: "/about" },
-                  { id: "tab2", label: "Contact US", action: "/contact" },
-                ],
-              },
-            },
-            {
-              id: "s2",
-              type: "Hero",
-              props: {
-                title: "Welcome to daycare center!!",
-                subtitle: "Providing quality childcare since 2010",
-                cta: "Explore Options",
-                ctaLink: "/services",
-                backgroundImage: "https://example.com/hero-bg.jpg",
-              },
-            },
-            {
-              id: "s3",
-              type: "Features",
-              props: {
-                title: "Our Services",
-                items: [
-                  {
-                    icon: "baby",
-                    title: "Infant Care",
-                    description: "Ages 0-12 months",
-                  },
-                  {
-                    icon: "child",
-                    title: "Toddler Care",
-                    description: "Ages 1-3 years",
-                  },
-                  {
-                    icon: "school",
-                    title: "Preschool",
-                    description: "Ages 3-5 years",
-                  },
-                ],
-              },
-            },
-            {
-              id: "s4",
-              type: "Footer",
-              props: {
-                copyright: "© 2026 Daycare Powered by Stepswatch",
-              },
-            },
-          ],
+const school1Template = {
+  name: "School 1",
+  version: "1.0.0",
+  description:
+    "A playful and vibrant template for schools and educational centers",
+  thumbnail:
+    "https://static.vecteezy.com/system/resources/previews/024/656/091/non_2x/colorful-playroom-with-toys-and-educational-materials-generated-by-ai-free-photo.jpg",
+  category: "education",
+  config: {
+    pages: [
+      {
+        id: "p1",
+        slug: "index",
+        title: "Home | School1",
+        seo: {
+          description: "Welcome to our school",
         },
-        {
-          id: "p2",
-          slug: "about",
-          title: "About Us | Daycare",
-          seo: {
-            description: "Learn more about our daycare center",
+        sections: [
+          {
+            id: "s1",
+            type: "school1navbar",
+            props: {
+              phone: "+000 - 123 - 456789",
+              email: "info@school1.com",
+              logoText: "KIDS",
+              links: [
+                { label: "Home", href: "./" },
+                { label: "About Us", href: "./about" },
+              ],
+              ctaText: "Enquire Now",
+              ctaLink: "./about",
+              socialLinks: {
+                facebook: "#",
+                twitter: "#",
+                linkedin: "#",
+                instagram: "#",
+              },
+            },
           },
-          sections: [
-            {
-              id: "s1",
-              type: "Navbar",
-              props: {
-                logoUrl: "https://example.com/logo.jpg",
-                tabs: [
-                  { id: "tab1", label: "Home", action: "/" },
-                  { id: "tab2", label: "Contact US", action: "/contact" },
-                ],
-              },
+          {
+            id: "s2",
+            type: "school1hero",
+            props: {
+              headline: "For Your Child's Bright Future",
+              subheadline: "Best choice for your your kids",
+              mainImage:
+                "https://static.vecteezy.com/system/resources/previews/024/656/091/non_2x/colorful-playroom-with-toys-and-educational-materials-generated-by-ai-free-photo.jpg",
+              ctaText: "Discover More",
+              ctaLink: "./about",
             },
-            {
-              id: "s2",
-              type: "Content",
-              props: {
-                title: "About Our Daycare",
-                content: "We have been serving families for over 15 years...",
-              },
-            },
-          ],
-        },
-        {
-          id: "p3",
-          slug: "contact",
-          title: "Contact Us | Daycare",
-          seo: {
-            description: "Get in touch with our daycare center",
           },
-          sections: [
-            {
-              id: "s1",
-              type: "Navbar",
-              props: {
-                logoUrl: "https://example.com/logo.jpg",
-                tabs: [
-                  { id: "tab1", label: "Home", action: "/" },
-                  { id: "tab2", label: "About US", action: "/about" },
-                ],
-              },
+          {
+            id: "s3",
+            type: "school1stats",
+            props: {
+              stats: [
+                {
+                  value: "1000+",
+                  label: "Students",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/512/10294/10294706.png",
+                },
+                {
+                  value: "100+",
+                  label: "Classrooms",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/512/8686/8686118.png",
+                },
+                {
+                  value: "500+",
+                  label: "Activities",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/512/8628/8628052.png",
+                },
+              ],
+              backgroundImage:
+                "https://www.transparenttextures.com/patterns/handmade-paper.png",
             },
-            {
-              id: "s2",
-              type: "ContactForm",
-              props: {
-                title: "Get in Touch",
-                fields: ["name", "email", "phone", "message"],
-                submitLabel: "Send Message",
-              },
-            },
-          ],
-        },
-        {
-          id: "p4",
-          slug: "articles",
-          title: "Articles | Daycare",
-          isDynamic: true,
-          dynamicConfig: {
-            collectionType: "articles",
-            listTemplate: {
-              title: "Latest Articles",
-              itemsPerPage: 10,
-            },
-            itemTemplate: {
-              sections: [
-                { type: "ArticleHeader", props: {} },
-                { type: "ArticleContent", props: {} },
-                { type: "ArticleFooter", props: {} },
+          },
+          {
+            id: "s4",
+            type: "school1braintraining",
+            props: {
+              title: "Brain Training Activities",
+              description:
+                "We provide various activities to sharpen young minds.",
+              activities: [
+                {
+                  title: "Swimming",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/512/10418/10418446.png",
+                  color: "#006080",
+                },
+                {
+                  title: "Building Blocks",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/512/10134/10134308.png",
+                  color: "#fe9c01",
+                },
+                {
+                  title: "Reading",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/256/10294/10294706.png",
+                  color: "#f50057",
+                },
               ],
             },
           },
-          sections: [],
-        },
-      ],
-      theme: {
-        color: {
-          primary: "#000",
-          secondary: "#666",
-          accent: "#ff6b00",
-          background: "#fff",
-          text: "#333",
-        },
-        font: "Inter",
-        fontSize: {
-          base: "16px",
-          heading: "32px",
-        },
-        fontWeight: {
-          normal: 400,
-          bold: 700,
-        },
-      },
-      navigation: [
-        { label: "Home", href: "/" },
-        { label: "About Us", href: "/about" },
-        { label: "Contact Us", href: "/contact" },
-        { label: "Articles", href: "/articles" },
-      ],
-      footer: {
-        copyright: "© 2026 Daycare Powered by Stepswatch",
-        links: [
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Terms of Service", href: "/terms" },
         ],
       },
-    },
-    isActive: true,
-    changelog: [
       {
-        version: "1.0.0",
-        date: new Date(),
-        changes: [{ type: "added", description: "Initial release", path: "/" }],
-      },
-    ],
-  },
-  {
-    name: "Restaurant",
-    version: "1.0.0",
-    description: "Modern template for restaurants and cafes",
-    thumbnail: "https://example.com/thumbnails/restaurant.jpg",
-    category: "food",
-    config: {
-      pages: [
-        {
-          id: "p1",
-          slug: "index",
-          title: "Restaurant | Home",
-          seo: {
-            description: "Welcome to our restaurant",
-          },
-          sections: [
-            {
-              id: "s1",
-              type: "Navbar",
-              props: {
-                logoUrl: "https://example.com/restaurant-logo.jpg",
-                tabs: [
-                  { id: "tab1", label: "Menu", action: "/menu" },
-                  {
-                    id: "tab2",
-                    label: "Reservations",
-                    action: "/reservations",
-                  },
-                ],
-              },
-            },
-            {
-              id: "s2",
-              type: "Hero",
-              props: {
-                title: "Fine Dining Experience",
-                subtitle: "Exquisite cuisine in an elegant atmosphere",
-                cta: "View Menu",
-                ctaLink: "/menu",
-              },
-            },
-            {
-              id: "s3",
-              type: "Gallery",
-              props: {
-                images: [],
-                title: "Our Dishes",
-              },
-            },
-          ],
+        id: "p2",
+        slug: "about",
+        title: "About Us | School1",
+        seo: {
+          description: "Learn more about our school and values",
         },
-        {
-          id: "p2",
-          slug: "menu",
-          title: "Menu | Restaurant",
-          isDynamic: true,
-          dynamicConfig: {
-            collectionType: "menuItems",
-            listTemplate: {
-              groupBy: "category",
+        sections: [
+          {
+            id: "s1",
+            type: "school1navbar",
+            props: {
+              phone: "+000 - 123 - 456789",
+              email: "info@school1.com",
+              logoText: "KIDS",
+              links: [
+                { label: "Home", href: "./" },
+                { label: "About Us", href: "./about" },
+              ],
+              ctaText: "Enquire Now",
+              ctaLink: "./about",
             },
           },
-          sections: [],
-        },
-      ],
-      theme: {
-        color: {
-          primary: "#1a1a1a",
-          secondary: "#8b7355",
-          accent: "#d4af37",
-          background: "#faf8f5",
-          text: "#333",
-        },
-        font: "Playfair Display",
-      },
-      navigation: [
-        { label: "Home", href: "/" },
-        { label: "Menu", href: "/menu" },
-        { label: "Reservations", href: "/reservations" },
-      ],
-      footer: {
-        copyright: "© 2026 Restaurant",
-      },
-    },
-    isActive: true,
-  },
-  {
-    name: "Portfolio",
-    version: "1.0.0",
-    description: "Clean portfolio template for creatives and professionals",
-    thumbnail: "https://example.com/thumbnails/portfolio.jpg",
-    category: "portfolio",
-    config: {
-      pages: [
-        {
-          id: "p1",
-          slug: "index",
-          title: "Portfolio",
-          seo: {
-            description: "My professional portfolio",
-          },
-          sections: [
-            {
-              id: "s1",
-              type: "Navbar",
-              props: {
-                logoUrl: "",
-                tabs: [
-                  { id: "tab1", label: "Work", action: "/work" },
-                  { id: "tab2", label: "Contact", action: "/contact" },
-                ],
-              },
-            },
-            {
-              id: "s2",
-              type: "Hero",
-              props: {
-                title: "Hello, I'm [Your Name]",
-                subtitle: "Creative professional specializing in design",
-                cta: "View My Work",
-              },
-            },
-            {
-              id: "s3",
-              type: "ProjectGrid",
-              props: {
-                title: "Featured Projects",
-                columns: 3,
-              },
-            },
-          ],
-        },
-        {
-          id: "p2",
-          slug: "work",
-          title: "My Work | Portfolio",
-          isDynamic: true,
-          dynamicConfig: {
-            collectionType: "projects",
-            listTemplate: {
-              layout: "grid",
-              columns: 3,
-            },
-            itemTemplate: {
-              sections: [
-                { type: "ProjectHero", props: {} },
-                { type: "ProjectDetails", props: {} },
-                { type: "ProjectGallery", props: {} },
+          {
+            id: "s2",
+            type: "school1stats",
+            props: {
+              stats: [
+                {
+                  value: "20+",
+                  label: "Years Excellence",
+                  image:
+                    "https://cdn-icons-png.flaticon.com/512/10295/10295587.png",
+                },
               ],
             },
           },
-          sections: [],
-        },
-      ],
-      theme: {
-        color: {
-          primary: "#0066ff",
-          secondary: "#1a1a1a",
-          accent: "#00ff88",
-          background: "#ffffff",
-          text: "#1a1a1a",
-        },
-        font: "Outfit",
+        ],
       },
-      navigation: [
-        { label: "Home", href: "/" },
-        { label: "Work", href: "/work" },
-        { label: "Contact", href: "/contact" },
-      ],
-      footer: {
-        copyright: "© 2026 Portfolio",
+    ],
+    theme: {
+      color: {
+        primary: "#e91e63",
+        secondary: "#006080",
+        accent: "#fe9c01",
+        background: "#ffffff",
+        text: "#333333",
       },
+      font: "Quicksand",
     },
-    isActive: true,
+    navigation: [
+      { label: "Home", href: "./" },
+      { label: "About Us", href: "./about" },
+    ],
+    footer: {
+      copyright: "© 2026 KIDS School. All rights reserved.",
+    },
   },
-];
+  isActive: true,
+};
+const templates = [school1Template];
+// const templates = [
+//   {
+//     name: "Daycare Center",
+//     version: "1.0.0",
+//     description:
+//       "A beautiful template for daycare centers and childcare facilities",
+//     thumbnail: "https://example.com/thumbnails/daycare.jpg",
+//     category: "education",
+//     config: {
+//       pages: [
+//         {
+//           id: "p1",
+//           slug: "index",
+//           title: "Daycare | Homepage",
+//           seo: {
+//             description: "This is the daycare page",
+//             ogImage: "https://example.com/ogimage.jpg",
+//           },
+//           sections: [
+//             {
+//               id: "s1",
+//               type: "Navbar",
+//               props: {
+//                 logoUrl: "https://example.com/logo.jpg",
+//                 tabs: [
+//                   { id: "tab1", label: "About US", action: "/about" },
+//                   { id: "tab2", label: "Contact US", action: "/contact" },
+//                 ],
+//               },
+//             },
+//             {
+//               id: "s2",
+//               type: "Hero",
+//               props: {
+//                 title: "Welcome to daycare center!!",
+//                 subtitle: "Providing quality childcare since 2010",
+//                 cta: "Explore Options",
+//                 ctaLink: "/services",
+//                 backgroundImage: "https://example.com/hero-bg.jpg",
+//               },
+//             },
+//             {
+//               id: "s3",
+//               type: "Features",
+//               props: {
+//                 title: "Our Services",
+//                 items: [
+//                   {
+//                     icon: "baby",
+//                     title: "Infant Care",
+//                     description: "Ages 0-12 months",
+//                   },
+//                   {
+//                     icon: "child",
+//                     title: "Toddler Care",
+//                     description: "Ages 1-3 years",
+//                   },
+//                   {
+//                     icon: "school",
+//                     title: "Preschool",
+//                     description: "Ages 3-5 years",
+//                   },
+//                 ],
+//               },
+//             },
+//             {
+//               id: "s4",
+//               type: "Footer",
+//               props: {
+//                 copyright: "© 2026 Daycare Powered by Stepswatch",
+//               },
+//             },
+//           ],
+//         },
+//         {
+//           id: "p2",
+//           slug: "about",
+//           title: "About Us | Daycare",
+//           seo: {
+//             description: "Learn more about our daycare center",
+//           },
+//           sections: [
+//             {
+//               id: "s1",
+//               type: "Navbar",
+//               props: {
+//                 logoUrl: "https://example.com/logo.jpg",
+//                 tabs: [
+//                   { id: "tab1", label: "Home", action: "/" },
+//                   { id: "tab2", label: "Contact US", action: "/contact" },
+//                 ],
+//               },
+//             },
+//             {
+//               id: "s2",
+//               type: "Content",
+//               props: {
+//                 title: "About Our Daycare",
+//                 content: "We have been serving families for over 15 years...",
+//               },
+//             },
+//           ],
+//         },
+//         {
+//           id: "p3",
+//           slug: "contact",
+//           title: "Contact Us | Daycare",
+//           seo: {
+//             description: "Get in touch with our daycare center",
+//           },
+//           sections: [
+//             {
+//               id: "s1",
+//               type: "Navbar",
+//               props: {
+//                 logoUrl: "https://example.com/logo.jpg",
+//                 tabs: [
+//                   { id: "tab1", label: "Home", action: "/" },
+//                   { id: "tab2", label: "About US", action: "/about" },
+//                 ],
+//               },
+//             },
+//             {
+//               id: "s2",
+//               type: "ContactForm",
+//               props: {
+//                 title: "Get in Touch",
+//                 fields: ["name", "email", "phone", "message"],
+//                 submitLabel: "Send Message",
+//               },
+//             },
+//           ],
+//         },
+//         {
+//           id: "p4",
+//           slug: "articles",
+//           title: "Articles | Daycare",
+//           isDynamic: true,
+//           dynamicConfig: {
+//             collectionType: "articles",
+//             listTemplate: {
+//               title: "Latest Articles",
+//               itemsPerPage: 10,
+//             },
+//             itemTemplate: {
+//               sections: [
+//                 { type: "ArticleHeader", props: {} },
+//                 { type: "ArticleContent", props: {} },
+//                 { type: "ArticleFooter", props: {} },
+//               ],
+//             },
+//           },
+//           sections: [],
+//         },
+//       ],
+//       theme: {
+//         color: {
+//           primary: "#000",
+//           secondary: "#666",
+//           accent: "#ff6b00",
+//           background: "#fff",
+//           text: "#333",
+//         },
+//         font: "Inter",
+//         fontSize: {
+//           base: "16px",
+//           heading: "32px",
+//         },
+//         fontWeight: {
+//           normal: 400,
+//           bold: 700,
+//         },
+//       },
+//       navigation: [
+//         { label: "Home", href: "/" },
+//         { label: "About Us", href: "/about" },
+//         { label: "Contact Us", href: "/contact" },
+//         { label: "Articles", href: "/articles" },
+//       ],
+//       footer: {
+//         copyright: "© 2026 Daycare Powered by Stepswatch",
+//         links: [
+//           { label: "Privacy Policy", href: "/privacy" },
+//           { label: "Terms of Service", href: "/terms" },
+//         ],
+//       },
+//     },
+//     isActive: true,
+//     changelog: [
+//       {
+//         version: "1.0.0",
+//         date: new Date(),
+//         changes: [{ type: "added", description: "Initial release", path: "/" }],
+//       },
+//     ],
+//   },
+//   {
+//     name: "Restaurant",
+//     version: "1.0.0",
+//     description: "Modern template for restaurants and cafes",
+//     thumbnail: "https://example.com/thumbnails/restaurant.jpg",
+//     category: "food",
+//     config: {
+//       pages: [
+//         {
+//           id: "p1",
+//           slug: "index",
+//           title: "Restaurant | Home",
+//           seo: {
+//             description: "Welcome to our restaurant",
+//           },
+//           sections: [
+//             {
+//               id: "s1",
+//               type: "Navbar",
+//               props: {
+//                 logoUrl: "https://example.com/restaurant-logo.jpg",
+//                 tabs: [
+//                   { id: "tab1", label: "Menu", action: "/menu" },
+//                   {
+//                     id: "tab2",
+//                     label: "Reservations",
+//                     action: "/reservations",
+//                   },
+//                 ],
+//               },
+//             },
+//             {
+//               id: "s2",
+//               type: "Hero",
+//               props: {
+//                 title: "Fine Dining Experience",
+//                 subtitle: "Exquisite cuisine in an elegant atmosphere",
+//                 cta: "View Menu",
+//                 ctaLink: "/menu",
+//               },
+//             },
+//             {
+//               id: "s3",
+//               type: "Gallery",
+//               props: {
+//                 images: [],
+//                 title: "Our Dishes",
+//               },
+//             },
+//           ],
+//         },
+//         {
+//           id: "p2",
+//           slug: "menu",
+//           title: "Menu | Restaurant",
+//           isDynamic: true,
+//           dynamicConfig: {
+//             collectionType: "menuItems",
+//             listTemplate: {
+//               groupBy: "category",
+//             },
+//           },
+//           sections: [],
+//         },
+//       ],
+//       theme: {
+//         color: {
+//           primary: "#1a1a1a",
+//           secondary: "#8b7355",
+//           accent: "#d4af37",
+//           background: "#faf8f5",
+//           text: "#333",
+//         },
+//         font: "Playfair Display",
+//       },
+//       navigation: [
+//         { label: "Home", href: "/" },
+//         { label: "Menu", href: "/menu" },
+//         { label: "Reservations", href: "/reservations" },
+//       ],
+//       footer: {
+//         copyright: "© 2026 Restaurant",
+//       },
+//     },
+//     isActive: true,
+//   },
+//   {
+//     name: "Portfolio",
+//     version: "1.0.0",
+//     description: "Clean portfolio template for creatives and professionals",
+//     thumbnail: "https://example.com/thumbnails/portfolio.jpg",
+//     category: "portfolio",
+//     config: {
+//       pages: [
+//         {
+//           id: "p1",
+//           slug: "index",
+//           title: "Portfolio",
+//           seo: {
+//             description: "My professional portfolio",
+//           },
+//           sections: [
+//             {
+//               id: "s1",
+//               type: "Navbar",
+//               props: {
+//                 logoUrl: "",
+//                 tabs: [
+//                   { id: "tab1", label: "Work", action: "/work" },
+//                   { id: "tab2", label: "Contact", action: "/contact" },
+//                 ],
+//               },
+//             },
+//             {
+//               id: "s2",
+//               type: "Hero",
+//               props: {
+//                 title: "Hello, I'm [Your Name]",
+//                 subtitle: "Creative professional specializing in design",
+//                 cta: "View My Work",
+//               },
+//             },
+//             {
+//               id: "s3",
+//               type: "ProjectGrid",
+//               props: {
+//                 title: "Featured Projects",
+//                 columns: 3,
+//               },
+//             },
+//           ],
+//         },
+//         {
+//           id: "p2",
+//           slug: "work",
+//           title: "My Work | Portfolio",
+//           isDynamic: true,
+//           dynamicConfig: {
+//             collectionType: "projects",
+//             listTemplate: {
+//               layout: "grid",
+//               columns: 3,
+//             },
+//             itemTemplate: {
+//               sections: [
+//                 { type: "ProjectHero", props: {} },
+//                 { type: "ProjectDetails", props: {} },
+//                 { type: "ProjectGallery", props: {} },
+//               ],
+//             },
+//           },
+//           sections: [],
+//         },
+//       ],
+//       theme: {
+//         color: {
+//           primary: "#0066ff",
+//           secondary: "#1a1a1a",
+//           accent: "#00ff88",
+//           background: "#ffffff",
+//           text: "#1a1a1a",
+//         },
+//         font: "Outfit",
+//       },
+//       navigation: [
+//         { label: "Home", href: "/" },
+//         { label: "Work", href: "/work" },
+//         { label: "Contact", href: "/contact" },
+//       ],
+//       footer: {
+//         copyright: "© 2026 Portfolio",
+//       },
+//     },
+//     isActive: true,
+//   },
+// ];
 
 const seedTemplates = async () => {
   try {
